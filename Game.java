@@ -1,7 +1,5 @@
 package com.example.mymemorygame;
 
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.CountDownTimer;
 import android.os.Bundle;
@@ -10,12 +8,13 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 public class Game extends AppCompatActivity {
 
+    ArrayList<Button> buttons  = new ArrayList<>(5);
     Button b1, b2, b3, b4, b5;
     int notAvtive = Color.parseColor("#b1e3be");
     int active = Color.parseColor("#a2e8e6");
@@ -29,16 +28,24 @@ public class Game extends AppCompatActivity {
     Random r = new Random();
     int number = 0;
     boolean ifPlay = false;
+    boolean ifWin = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+
         b1 = findViewById(R.id.button1);
         b2 = findViewById(R.id.button2);
         b3 = findViewById(R.id.button3);
         b4 = findViewById(R.id.button4);
         b5 = findViewById(R.id.button5);
+
+        buttons.add(b1);
+        buttons.add(b2);
+        buttons.add(b3);
+        buttons.add(b4);
+        buttons.add(b5);
 
         setVariable();
 
@@ -49,11 +56,9 @@ public class Game extends AppCompatActivity {
         new CountDownTimer(time, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
-                b1.setBackgroundColor(notAvtive);
-                b2.setBackgroundColor(notAvtive);
-                b3.setBackgroundColor(notAvtive);
-                b4.setBackgroundColor(notAvtive);
-                b5.setBackgroundColor(notAvtive);
+                for(Button butt : buttons){
+                    butt.setBackgroundColor(notAvtive);
+                }
 
                 System.out.println(number);
 
@@ -95,16 +100,11 @@ public class Game extends AppCompatActivity {
             @Override
             public void onFinish() {
                 if (number != 0) number = 0;
-                b1.setBackgroundColor(notAvtive);
-                b2.setBackgroundColor(notAvtive);
-                b3.setBackgroundColor(notAvtive);
-                b4.setBackgroundColor(notAvtive);
-                b5.setBackgroundColor(notAvtive);
-                b1.setText("Click");
-                b2.setText("Click");
-                b3.setText("Click");
-                b4.setText("Click");
-                b5.setText("Click");
+
+                for(Button butt : buttons){
+                    butt.setBackgroundColor(notAvtive);
+                    butt.setText("Click");
+                }
 
             }
         }.start();
@@ -120,7 +120,10 @@ public class Game extends AppCompatActivity {
             userOrder[number] = 1;
             number++;
 
-            if (number == count) finishGame(b1, toCheck());
+            if (number == count) {
+                toCheck();
+                finishGame(b1);
+            }
         }
     }
 
@@ -132,7 +135,10 @@ public class Game extends AppCompatActivity {
             userOrder[number] = 2;
             number++;
 
-            if (number == count) finishGame(b2, toCheck());
+            if (number == count) {
+                toCheck();
+                finishGame(b2);
+            }
         }
     }
 
@@ -144,7 +150,10 @@ public class Game extends AppCompatActivity {
             userOrder[number] = 3;
             number++;
 
-            if (number == count) finishGame(b3, toCheck());
+            if (number == count) {
+                toCheck();
+                finishGame(b3);
+            }
 
 
         }
@@ -158,7 +167,10 @@ public class Game extends AppCompatActivity {
             userOrder[number] = 4;
             number++;
 
-            if (number == count) finishGame(b4, toCheck());
+            if (number == count) {
+                toCheck();
+                finishGame(b4);
+            }
 
 
         }
@@ -172,7 +184,10 @@ public class Game extends AppCompatActivity {
             userOrder[number] = 5;
             number++;
 
-            if (number == count) finishGame(b5, toCheck());
+            if (number == count) {
+                toCheck();
+                finishGame(b5);
+            }
 
 
         }
@@ -191,15 +206,14 @@ public class Game extends AppCompatActivity {
         }
     }
 
-    public boolean toCheck() {
+    public void toCheck() {
         for (int i = 0; i < count; i++) {
-            if (userOrder[i] != queque[i]) return false;
+            if (userOrder[i] != queque[i]) ifWin = false;
         }
-        return true;
     }
 
 
-    public void finishGame(Button button, boolean ifWin) {
+    public void finishGame(Button button) {
         if (ifWin) {
             button.setTextColor(Color.parseColor("#ffffff"));
             button.setText("You win!!!");
@@ -218,11 +232,9 @@ public class Game extends AppCompatActivity {
 
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
         alert.setMessage("You want to leave or play again?");
-        alert.setTitle("Alert");
-        alert.setPositiveButton("Play", (dialog, which) -> {
-            finish();
-
-        });
+        if(ifWin) alert.setTitle("WIN");
+        else alert.setTitle("LOSE");
+        alert.setPositiveButton("Play", (dialog, which) -> finish());
 
         alert.setNegativeButton("Leave", (dialog, which) -> {
             finishAffinity();
